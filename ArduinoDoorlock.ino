@@ -61,14 +61,24 @@ int GetValue(String address, const int port)
       const char* json = payload.c_str();
         
       StaticJsonDocument<200> doc;
-      auto error = deserializeJson(doc, json);          
-      if (error)
+      auto error1 = deserializeJson(doc, json);          
+      if (error1)
       {
         Serial.print(F("deserializeJson() failed with code "));
-        Serial.println(error.c_str());
+        Serial.println(error1.c_str());
+        return -1;
+      }
+      String result = doc["result"];
+      Serial.println(result);
+      auto error2 = deserializeJson(doc, result);          
+      if (error2)
+      {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error2.c_str());
         return -1;
       }
       num = doc["condValue"];
+
       Serial.println(num);  
     } 
     else 
