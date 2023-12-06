@@ -59,27 +59,39 @@ int GetValue(String address, const int port)
       String payload = http.getString();
       Serial.println(payload);
       const char* json = payload.c_str();
-        
+
       StaticJsonDocument<200> doc;
-      auto error1 = deserializeJson(doc, json);          
+      auto error1 = deserializeJson(doc, json);  
       if (error1)
       {
         Serial.print(F("deserializeJson() failed with code "));
         Serial.println(error1.c_str());
         return -1;
       }
-      String result = doc["result"];
-      Serial.println(result);
-      auto error2 = deserializeJson(doc, result);          
-      if (error2)
+      bool isSuccess = doc["isSuccess"];
+
+      if (isSuccess==true)
       {
-        Serial.print(F("deserializeJson() failed with code "));
-        Serial.println(error2.c_str());
+        String result = doc["result"];
+        Serial.println(result);
+        auto error2 = deserializeJson(doc, result);          
+        if (error2)
+        {
+          Serial.print(F("deserializeJson() failed with code "));
+          Serial.println(error2.c_str());
+          return -1;
+        }
+        num = doc["condValue"];
+        Serial.println(num); 
+      }
+      else if (isSuccess!=true)
+      {
+        Serial.println("wrong request");
+        lcd.setCursor(1,1);
+        lcd.print("Wrong Request");
+        http.end();
         return -1;
       }
-      num = doc["condValue"];
-
-      Serial.println(num);  
     } 
     else 
     {
